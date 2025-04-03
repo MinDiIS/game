@@ -1,7 +1,58 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@using ComputerService.Database
+@using ComputerService.Models
+@inject GamerContext ef
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="games-container">
+    <button class="Regest"><a href="http://localhost:5208/2" >Регистрация</a></button>
+    <button class="Regest"> <a href="http://localhost:5208/3">Вход</a></button>
+    <!-- Add Game Form -->
+    <div class="game-form">
+        <EditForm FormName="formAddItem" Model="_game" OnValidSubmit="@Sumbit">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
 
-Welcome to your new app.
+            <div class="form-group">
+                <label>Введите название игры</label>
+                <input type="text" class="form-control" @bind="_game.NameGame"/>
+            </div>
+
+            <div class="form-group">
+                <label>Стоимость</label>
+                <input type="number" class="form-control" @bind="_game.Price"/>
+            </div>
+
+            <button type="submit" class="submit-btn">Добавить игру</button>
+        </EditForm>
+    </div>
+
+    <!-- Games List -->
+    <div class="games-list">
+        @if (ef.Games.Any())
+        {
+        @foreach (var item in ef.Games.ToList())
+        {
+        <div class="game-item">
+            <span class="game-name">@item.NameGame</span>
+            <span class="game-price">@item.Price рублей</span>
+        </div>
+        }
+        }
+        else
+        {
+        <div class="empty-list-message">Нет доступных игр. Добавьте первую игру!</div>
+        }
+    </div>
+</div>
+
+@code {
+private Game _game = new Game();
+
+private void Sumbit(EditContext arg)
+{
+ef.Add(_game);
+ef.SaveChanges();
+_game = new Game();
+}
+}
